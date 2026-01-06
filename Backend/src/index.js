@@ -6,10 +6,9 @@ import express from "express"; // this is es6 module way of importing , this can
 import { connectDB } from "./lib/db.js";
 const app = express();
 
-
 app.use(express.json()); // to parse the incoming request body as json
 dotenv.config(); // to access the .env file variables
-const PORT = process.env.PORT // accessing port from .env file
+const PORT = process.env.PORT; // accessing port from .env file
 
 import authRoutes from "./routes/auth.routes.js";
 app.use("/api/auth", authRoutes);
@@ -18,6 +17,6 @@ app.use("/api/auth", authRoutes);
 //     console.log("Server is running on port 5001");
 // })
 app.listen(PORT, () => {
-    console.log("Server is running on port PORT:" + PORT);
-    connectDB(); // calling the function to connect to the database
-})
+  console.log("Server is running on port PORT:" + PORT);
+  connectDB(); // calling the function to connect to the database
+});
