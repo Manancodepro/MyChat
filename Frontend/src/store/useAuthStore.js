@@ -45,7 +45,7 @@ import toast from "react-hot-toast";
 import { User } from "lucide-react";
 export const useAuthStore = create((set) => ({
   authUser: null,
-  isSingingUp: false,
+  isSigningUp: false,
   isLoggingIn: false,
   isUpadtingProfile: false,
   isCheckingAuth: true,
@@ -63,15 +63,17 @@ export const useAuthStore = create((set) => ({
   },
 
   signup: async (data) => {
-    set({ isSingingUp: true });
+    set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
       toast.success("Account created successfully");
+      // set({ authUser: res.data });
+      return res.data;
     } catch (error) {
       toast.error(error.response.data.message);
+      console.log("Error in generating success toast");
     } finally {
-      set({ isSingingUp: false });
+      set({ isSigningUp: false });
     }
   },
 }));
