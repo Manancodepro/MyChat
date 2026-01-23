@@ -52,7 +52,7 @@ export const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axiosInstance.get("/auth/check");
+      const res = await axiosInstance.get("/auth/check-auth");
       set({ authUser: res.data });
     } catch (error) {
       console.log("Error in CheckAuth:", error);
@@ -66,14 +66,35 @@ export const useAuthStore = create((set) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
+      console.log("Signup response:", res.data);
+      set({ authUser: res.data });
       toast.success("Account created successfully");
-      // set({ authUser: res.data });
       return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
-      console.log("Error in generating success toast");
+      console.error("Signup error full:", error);
+      console.error("Error response:", error.response);
+
+      let errorMessage = "Signup failed";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      console.error("Final error message:", errorMessage);
+      toast.error(errorMessage);
     } finally {
       set({ isSigningUp: false });
     }
   },
+  logout:async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      set({ authUser: null });
+      toast.success("Logged out successfully");
+    } catch (error) {
+      toast.error(error.response.data.message)
+    }
+  }
 }));

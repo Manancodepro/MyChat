@@ -12,21 +12,26 @@ app.use(express.json()); // to parse the incoming request body as json
 app.use(cookieParser()); // to parse cookies from the incoming request
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend url
+    origin: ["http://localhost:5173"], // frontend url - localhost only
     credentials: true, // to allow cookies to be sent
-  })
+  }),
 );
-const PORT = process.env.PORT; // accessing port from .env file
+const PORT = process.env.PORT || 5000; // accessing port from .env file
 
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
-// app.listen(5001, () => {
-//     console.log("Server is running on port 5001");
-// })
-app.listen(PORT, () => {
-  console.log("Server is running on port PORT:" + PORT);
-  connectDB(); // calling the function to connect to the database
-});
+// Connect to database first, then start server
+connectDB()
+  .then(() => {
+    app.listen(PORT, "127.0.0.1", () => {
+      console.log("Server is running on port: " + PORT);
+      console.log("Access via: http://localhost:" + PORT);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database, server not starting");
+    process.exit(1);
+  });

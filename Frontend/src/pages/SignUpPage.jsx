@@ -8,17 +8,28 @@ import {
   Loader,
   Loader2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern.jsx";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
+
 const SignUpPage = () => {
+  const navigate = useNavigate();
   const [showpassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
   });
-  const { signup, isSignupPage, isSigningUp } = useAuthStore();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const { signup, isSignupPage, isSigningUp, authUser } = useAuthStore();
+
+  // Only redirect AFTER signup is successful, not on initial page load
+  useEffect(() => {
+    if (hasSubmitted && authUser) {
+      navigate("/");
+    }
+  }, [hasSubmitted, authUser, navigate]);
 
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
@@ -36,7 +47,10 @@ const SignUpPage = () => {
     e.preventDefault();
     const success = validateForm();
 
-    if (success===true) signup(formData);
+    if (success === true) {
+      setHasSubmitted(true); // Mark that user submitted form
+      signup(formData);
+    }
   };
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -155,7 +169,7 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* right side */}
       <AuthImagePattern
         title="Join our community"
