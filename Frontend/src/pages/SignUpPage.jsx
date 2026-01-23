@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
+  Eye,
   EyeOff,
   MessageSquare,
   Lock,
   User,
-  Loader,
+  Mail,
   Loader2,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,7 +23,7 @@ const SignUpPage = () => {
     password: "",
   });
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const { signup, isSignupPage, isSigningUp, authUser } = useAuthStore();
+  const { signup, isSigningUp, authUser } = useAuthStore();
 
   // Only redirect AFTER signup is successful, not on initial page load
   useEffect(() => {
@@ -53,15 +54,15 @@ const SignUpPage = () => {
     }
   };
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="h-screen flex flex-col lg:flex-row pt-16">
       {/*left side*/}
-      <div className="flex flex-col justify-center items-center p-6 sm:p-12">
+      <div className="flex flex-col justify-center items-center p-6 sm:p-12 flex-1">
         <div className="w-full max-w-md space-y-8">
           {/* LOGO */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="size-6 text-primary" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <MessageSquare className="w-6 h-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
               <p className="text-base-content/60">
@@ -77,7 +78,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className="size-5 text-base-content/40"></User>
+                  <User className="h-5 w-5 text-base-content/40"></User>
                 </div>
                 <input
                   type="text"
@@ -97,7 +98,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className="size-5 text-base-content/40"></User>
+                  <Mail className="h-5 w-5 text-base-content/40"></Mail>
                 </div>
                 <input
                   type="email"
@@ -117,7 +118,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Lock className="size-5 text-base-content/40"></Lock>
+                  <Lock className="h-5 w-5 text-base-content/40"></Lock>
                 </div>
                 <input
                   type={showpassword ? "text" : "password"}
@@ -134,9 +135,9 @@ const SignUpPage = () => {
                   onClick={() => setShowPassword(!showpassword)}
                 >
                   {showpassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
+                    <EyeOff className="h-5 w-5 text-base-content/40" />
                   ) : (
-                    <EyeOff className="size-5 text-base-content/40" />
+                    <Eye className="h-5 w-5 text-base-content/40" />
                   )}
                 </button>
               </div>
@@ -149,8 +150,8 @@ const SignUpPage = () => {
             >
               {isSigningUp ? (
                 <>
-                  <Loader2 className="size-9 animate-spin" />
-                  Loading....
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Loading...
                 </>
               ) : (
                 "Create Account"
