@@ -8,7 +8,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors"; // to prevent cors error which occurs when frontend and backend are on different ports
 const app = express();
 
-app.use(express.json()); // to parse the incoming request body as json
+app.use(express.json({ limit: "10mb" })); // to parse the incoming request body as json (compressed base64 images)
+app.use(express.urlencoded({ limit: "10mb", extended: true })); // to parse URL encoded data
 app.use(cookieParser()); // to parse cookies from the incoming request
 app.use(
   cors({

@@ -88,13 +88,13 @@ export const useAuthStore = create((set) => ({
       set({ isSigningUp: false });
     }
   },
-  logout:async (data) => {
+  logout: async (data) => {
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message);
     }
   },
   login: async (data) => {
@@ -116,5 +116,25 @@ export const useAuthStore = create((set) => ({
     } finally {
       set({ isLoggingIn: false });
     }
-  }
+  },
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      // axios automatically detects FormData and sets multipart/form-data header
+      // If FormData is sent, axios will NOT stringify it (keeping it as binary)
+      // If JSON is sent, axios will stringify and set application/json
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      console.log("Update profile response:", res.data);
+      set({ authUser: res.data });
+      toast.success("Profile updated successfully.");
+      return res.data;
+    } catch (error) {
+      console.error("Profile update error:", error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to update profile";
+      toast.error(errorMessage);
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
 }));

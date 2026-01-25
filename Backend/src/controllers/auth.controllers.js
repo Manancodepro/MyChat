@@ -95,17 +95,28 @@ export const updateProfile = async (req, res) => {
     const userId = req.user._id; // getting userId from req.user which is set in protectRoute middleware
 
     if (!profilePic) {
-      res.status(400).json({ message: "Profile picture is required" });
+      return res.status(400).json({ message: "Profile picture is required" });
     }
-    const uploadProfilePic = await cloudinary.uploader.upload(profilePic); // uploading profilePic to cloudinary
-    const updatedUser = await User.findByIdAndUpdate(userId, {
-      profilePic: uploadProfilePic.secure_url,
-    }); // updating user profilePic in database
 
+    console.log("Uploading profile picture to Cloudinary...");
+    const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
+      folder: "chat_app_profiles", // organize uploads
+      resource_type: "auto",
+      quality: "auto", // let cloudinary optimize
+    }); // uploading profilePic to cloudinary
+    console.log("Upload successful:", uploadProfilePic.secure_url);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadProfilePic.secure_url },
+      { new: true },
+    ); // updating user profilePic in database and returning the updated document
+
+    console.log("User updated in database:", updatedUser);
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.log("Error in updateProfile controller", error.message);``
-    res.status(500).json({ message: " Internal Server Error" });
+    console.log("Error in updateProfile controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
