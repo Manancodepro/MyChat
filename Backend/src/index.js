@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 5000; // accessing port from .env file
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Connect to database first, then start server
 connectDB()
