@@ -1,9 +1,8 @@
 const AuthImagePattern = ({ title, subtitle }) => {
-  // if subtitle causes an error in future turn of the react prop types in the es.config.js file see timestamp: 2:01:15
   return (
-    <div className="hidden lg:flex items-center justify-center p-12">
+    <div className="hidden lg:flex items-center justify-center bg-base-200 p-12">
       <div className="max-w-md text-center">
-        <div className="grid grid-cols-3 gap-3 mb-8 ">
+        <div className="grid grid-cols-3 gap-3 mb-8">
           {[...Array(9)].map((_, i) => (
             <div
               key={i}
@@ -12,9 +11,8 @@ const AuthImagePattern = ({ title, subtitle }) => {
               }`}
             />
           ))}
-          ,
         </div>
-        <h2 className="text-2xl font-bold mb-4 ">{title}</h2>
+        <h2 className="text-2xl font-bold mb-4">{title}</h2>
         <p className="text-base-content/60">{subtitle}</p>
       </div>
     </div>

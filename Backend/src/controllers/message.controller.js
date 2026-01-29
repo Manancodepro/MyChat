@@ -4,9 +4,11 @@ import cloudinary from "../lib/cloudinary.js";
 export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id; // get logged in user id from req.user set in protectRoute middleware
+    console.log("Getting users for sidebar. Logged-in user ID:", loggedInUserId);
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId }, // exclude logged in user tell this to mongoose
     }).select("-password"); // exclude password field
+    console.log("Filtered users found:", filteredUsers.length, filteredUsers);
     res.status(200).json(filteredUsers);
   } catch (error) {
     console.log("Error in getUsersForSidebar controller", error.message);
