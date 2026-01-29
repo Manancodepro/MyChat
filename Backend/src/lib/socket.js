@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import http from "http";
+import http, { get } from "http";
 import express from "express";
 
 const app = express();
@@ -11,11 +11,24 @@ const io = new Server(server, {
   },
 });
 
+export function getReceiverSocketId(userId) {
+  return userSocketMap[userId];
+}
+//used to store online users
+const userSocketMap = {}; // user id as key and socket id as value
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
+  const userId = socket.handshake.query.userId;
+  if (userId) {
+    userSocketMap[userId] = socket.id;
+  }
+
+  io.emit("GetOnlineUsers", Object.keys(userSocketMap)); // it tells whether the user is online or not
 
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
+    delete userSocketMap[userId];
+    io.emit("GetOnlineUsers", Object.keys(userSocketMap));
   });
 });
 
