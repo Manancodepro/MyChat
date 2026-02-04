@@ -1,11 +1,5 @@
 import express from "express";
-import {
-  login,
-  logout,
-  signup,
-  updateProfile,
-  checkAuth,
-} from "../controllers/auth.controllers.js"; // putting .js is mandatory in es6 module
+import {login,logout,signup,updateProfile,checkAuth} from "../controllers/auth.controllers.js"; // putting .js is mandatory in es6 module
 import { protectRoute } from "../middleware/auth.middleware.js";
 const router = express.Router();
 // router.post("/signup", (req, res) => {
@@ -27,5 +21,6 @@ router.post("/logout", logout); // calling function from controller function log
 
 router.put("/update-profile", protectRoute, updateProfile); // calling function from controller function updateProfile
 
-router.get("/check-auth", protectRoute, checkAuth); // route to check if user is authenticated or not
+router.get("/check-auth", protectRoute, checkAuth); // route to check if user is authenticated or not during app reload
+
 export default router;
