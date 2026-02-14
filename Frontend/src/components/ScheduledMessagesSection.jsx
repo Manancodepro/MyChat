@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Clock, Trash2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 const ScheduledMessagesSection = () => {
   const {
