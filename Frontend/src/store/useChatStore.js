@@ -76,8 +76,10 @@ export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
   selectedUser: null,
+  scheduledMessages: [],
   isUsersLoading: false,
   isMessagesLoading: false,
+  isScheduling: false,
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -97,11 +99,22 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Failed to load messages");
     } finally {
       set({ isMessagesLoading: false });
     }
   },
+
+  // Refetch messages to catch any missed scheduled deliveries
+  refreshMessages: async (userId) => {
+    try {
+      const res = await axiosInstance.get(`/messages/${userId}`);
+      set({ messages: res.data });
+    } catch (error) {
+      console.error("Failed to refresh messages:", error);
+    }
+  },
+
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
     try {
@@ -111,26 +124,59 @@ export const useChatStore = create((set, get) => ({
       );
       set({ messages: [...messages, res.data] });
     } catch (error) {
-      // toast.error(error.response.data.message);
       toast.error(error?.response?.data?.message || "Failed to send message");
     }
   },
 
-  // subscribeToMessages: () => {
-  //   const { selectedUser } = get();
-  //   if (!selectedUser) return;
+  scheduleMessage: async (data) => {
+    const { selectedUser, messages } = get();
+    set({ isScheduling: true });
+    try {
+      const payload = {
+        text: data.text || "",
+        image: data.image || null,
+        scheduledTime: data.scheduledTime.toISOString(),
+      };
 
-  //   const socket = useAuthStore.getState().socket;
+      const res = await axiosInstance.post(
+        `/messages/schedule/${selectedUser._id}`,
+        payload,
+      );
 
-  //   socket.on("newMessage", (newMessage) => {
-  //     const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-  //     if (!isMessageSentFromSelectedUser) return;
+      set({ messages: [...messages, res.data] });
+      toast.success(
+        `Message scheduled for ${new Date(res.data.scheduledTime).toLocaleString()}`,
+      );
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to schedule message");
+    } finally {
+      set({ isScheduling: false });
+    }
+  },
 
-  //     set({
-  //       messages: [...get().messages, newMessage],
-  //     });
-  //   });
-  // },
+  cancelScheduledMessage: async (messageId) => {
+    try {
+      await axiosInstance.delete(`/messages/cancel/${messageId}`);
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === messageId ? { ...msg, status: "cancelled" } : msg,
+        ),
+      }));
+      toast.success("Scheduled message cancelled");
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to cancel message");
+    }
+  },
+
+  getScheduledMessages: async () => {
+    try {
+      const res = await axiosInstance.get("/messages/scheduled/list");
+      set({ scheduledMessages: res.data });
+    } catch (error) {
+      console.error("Failed to fetch scheduled messages:", error);
+    }
+  },
+
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
@@ -138,8 +184,13 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
-    socket.off("newMessage"); // ✅ VERY IMPORTANT
+    socket.off("newMessage");
+    socket.off("messageScheduled");
+    socket.off("messageCancelled");
+    socket.off("scheduledMessageSent");
+    socket.off("messageDelivered");
 
+    // Handle real-time delivered scheduled messages
     socket.on("newMessage", (newMessage) => {
       const getIdString = (id) => {
         if (id === null || id === undefined) return "";
@@ -154,17 +205,79 @@ export const useChatStore = create((set, get) => ({
       const senderId = getIdString(newMessage.senderId);
       const receiverId = getIdString(newMessage.receiverId);
       const selId = getIdString(selectedUser._id);
+      const authId = getIdString(useAuthStore.getState().authUser._id);
 
-      if (senderId !== selId && receiverId !== selId) return;
+      // Check if this message is relevant to current chat
+      const isRelevantToChat =
+        (senderId === selId && receiverId === authId) ||
+        (senderId === authId && receiverId === selId);
+
+      if (!isRelevantToChat) return;
+
+      // Prevent duplicate messages
+      const isDuplicate = get().messages.some(
+        (msg) => msg._id === newMessage._id,
+      );
+      if (isDuplicate) {
+        // Update existing message if it's a delivery update
+        set((state) => ({
+          messages: state.messages.map((msg) =>
+            msg._id === newMessage._id ? newMessage : msg,
+          ),
+        }));
+        return;
+      }
 
       set((state) => ({
         messages: [...state.messages, newMessage],
       }));
     });
+
+    // Handle scheduled message confirmation
+    socket.on("messageScheduled", (data) => {
+      toast.success("Message scheduled successfully");
+    });
+
+    // Handle scheduled message cancellation
+    socket.on("messageCancelled", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId ? { ...msg, status: "cancelled" } : msg,
+        ),
+      }));
+    });
+
+    // Handle scheduled message sent - UPDATE TIME TO DELIVERY TIME
+    socket.on("messageDelivered", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, status: "sent", deliveredAt: data.deliveredAt }
+            : msg,
+        ),
+      }));
+    });
+
+    // Fallback for old event name
+    socket.on("scheduledMessageSent", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, status: "sent", deliveredAt: data.deliveredAt }
+            : msg,
+        ),
+      }));
+    });
   },
+
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
+    socket.off("messageScheduled");
+    socket.off("messageCancelled");
+    socket.off("scheduledMessageSent");
+    socket.off("messageDelivered");
   },
+
   setSelectedUser: (selectedUser) => set({ selectedUser }),
 }));

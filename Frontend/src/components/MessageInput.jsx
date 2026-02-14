@@ -1,13 +1,15 @@
 import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Image, Send, X } from "lucide-react";
+import { Image, Send, X, Clock } from "lucide-react";
 import toast from "react-hot-toast";
+import ScheduleModal from "./ScheduleModal";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const { sendMessage, scheduleMessage, isScheduling } = useChatStore();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -44,6 +46,29 @@ const MessageInput = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
+    }
+  };
+
+  const handleScheduleMessage = async (scheduledDateTime) => {
+    if (!text.trim() && !imagePreview) {
+      toast.error("Please add text or an image to schedule");
+      return;
+    }
+
+    try {
+      await scheduleMessage({
+        text: text.trim(),
+        image: imagePreview,
+        scheduledTime: scheduledDateTime,
+      });
+
+      // Clear form
+      setText("");
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setShowScheduleModal(false);
+    } catch (error) {
+      console.error("Failed to schedule message:", error);
     }
   };
 
@@ -95,6 +120,17 @@ const MessageInput = () => {
             <Image size={20} />
           </button>
         </div>
+
+        <button
+          type="button"
+          className="btn btn-sm btn-circle text-orange-400 hover:bg-orange-900"
+          title="Schedule Message"
+          onClick={() => setShowScheduleModal(true)}
+          disabled={isScheduling}
+        >
+          <Clock size={18} />
+        </button>
+
         <button
           type="submit"
           className="btn btn-sm btn-circle"
@@ -103,6 +139,13 @@ const MessageInput = () => {
           <Send size={22} />
         </button>
       </form>
+
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleMessage}
+        isLoading={isScheduling}
+      />
     </div>
   );
 };

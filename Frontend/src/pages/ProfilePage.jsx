@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
+import ScheduledMessagesSection from "../components/ScheduledMessagesSection";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -149,6 +150,11 @@ const ProfilePage = () => {
                 <span className="text-green-500">Active</span>
               </div>
             </div>
+          </div>
+
+          {/* Scheduled Messages Section */}
+          <div className="mt-6 bg-base-300 rounded-xl p-6">
+            <ScheduledMessagesSection />
           </div>
         </div>
       </div>

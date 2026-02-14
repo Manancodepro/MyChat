@@ -18,8 +18,29 @@ const MessageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["sent", "scheduled", "cancelled"],
+      default: "sent",
+    },
+    scheduledTime: {
+      type: Date,
+      default: null,
+    },
+    deliveredAt: {
+      type: Date,
+      default: null,
+    },
+    jobId: {
+      type: String,
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-const Message = mongoose.model("Message", MessageSchema); // creating a model named Message using the MessageSchema
+
+// Index for scheduled messages queries
+MessageSchema.index({ status: 1, scheduledTime: 1 });
+
+const Message = mongoose.model("Message", MessageSchema);
 export default Message;
