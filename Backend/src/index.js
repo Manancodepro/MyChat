@@ -10,6 +10,8 @@ import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import { app, server } from "./lib/socket.js";
+import { closeMessageQueue } from "./lib/messageQueue.js";
+import redis from "./lib/redis.js";
 
 dotenv.config();
 
@@ -59,7 +61,34 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-server.listen(PORT, () => {
+const httpServer = server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
 });
+
+// Graceful shutdown
+const gracefulShutdown = async (signal) => {
+  console.log(`\n[${signal}] Received, shutting down gracefully...`);
+
+  try {
+    httpServer.close(async () => {
+      console.log("HTTP server closed");
+      await closeMessageQueue();
+      await redis.quit();
+      console.log("[Shutdown] All resources cleaned up");
+      process.exit(0);
+    });
+
+    // Force shutdown after 10 seconds
+    setTimeout(() => {
+      console.error("[Shutdown] Forced shutdown");
+      process.exit(1);
+    }, 10000);
+  } catch (error) {
+    console.error("[Shutdown] Error during shutdown:", error);
+    process.exit(1);
+  }
+};
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
