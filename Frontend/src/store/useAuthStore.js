@@ -255,17 +255,38 @@ export const useAuthStore = create((set, get) => ({
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
-      query: {
-        userId: authUser._id,
-      },
+    console.log("[useAuthStore] connectSocket ->", {
+      BASE_URL,
+      authUserId: authUser?._id,
     });
-    socket.connect();
+
+    // Send userId via socket auth (preferred) and query (fallback)
+    const socket = io(BASE_URL, {
+      auth: { userId: String(authUser._id) },
+      query: { userId: String(authUser._id) },
+    });
+
+    socket.on("connect", () => {
+      console.log("[socket] connected", socket.id);
+    });
+    socket.on("connect_error", (err) => {
+      console.error("[socket] connect_error", err);
+    });
 
     set({ socket: socket });
 
     socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
+      // Normalize IDs to strings to avoid type mismatch between ObjectId and string
+      try {
+        const ids = Array.isArray(userIds)
+          ? userIds.map((id) => String(id))
+          : [];
+        console.log("[socket] getOnlineUsers", ids);
+        set({ onlineUsers: ids });
+      } catch (e) {
+        console.log("[socket] getOnlineUsers (raw)", userIds);
+        set({ onlineUsers: userIds });
+      }
     });
   },
   disconnectSocket: () => {

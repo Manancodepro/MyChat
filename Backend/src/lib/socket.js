@@ -41,9 +41,10 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: CLIENT_ORIGIN,
     credentials: true,
   },
 });
@@ -52,16 +53,22 @@ const io = new Server(server, {
 const userSocketMap = new Map(); // userId → socketId
 
 export function getReceiverSocketId(userId) {
-  return userSocketMap.get(userId);
+  if (!userId) return undefined;
+  return userSocketMap.get(String(userId));
 }
 
 io.on("connection", (socket) => {
   console.log("✅ User connected:", socket.id);
 
-  const userId = socket.handshake.query.userId;
+  // support both query (older clients) and auth (recommended)
+  const qUserId = socket.handshake?.query?.userId;
+  const aUserId = socket.handshake?.auth?.userId;
+  const userId = qUserId || aUserId;
+
+  console.log("[socket] handshake.query:", qUserId, "handshake.auth:", aUserId);
 
   if (userId) {
-    userSocketMap.set(userId, socket.id);
+    userSocketMap.set(String(userId), socket.id);
   }
 
   io.emit("getOnlineUsers", Array.from(userSocketMap.keys()));

@@ -141,11 +141,21 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage"); // ✅ VERY IMPORTANT
 
     socket.on("newMessage", (newMessage) => {
-      if (
-        newMessage.senderId !== selectedUser._id &&
-        newMessage.receiverId !== selectedUser._id
-      )
-        return;
+      const getIdString = (id) => {
+        if (id === null || id === undefined) return "";
+        if (typeof id === "string") return id;
+        if (typeof id === "object") {
+          if (id._id) return String(id._id);
+          if (typeof id.toString === "function") return id.toString();
+        }
+        return String(id);
+      };
+
+      const senderId = getIdString(newMessage.senderId);
+      const receiverId = getIdString(newMessage.receiverId);
+      const selId = getIdString(selectedUser._id);
+
+      if (senderId !== selId && receiverId !== selId) return;
 
       set((state) => ({
         messages: [...state.messages, newMessage],

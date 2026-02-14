@@ -188,7 +188,6 @@
 // };
 // export default ChatContainer;
 
-
 import { useChatStore } from "../store/useChatStore";
 import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
@@ -228,7 +227,11 @@ const ChatContainer = () => {
   }, [messages]);
 
   if (!selectedUser) {
-    return <div className="flex-1 flex items-center justify-center">Select a chat</div>;
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        Select a chat
+      </div>
+    );
   }
 
   if (isMessagesLoading) {
@@ -246,45 +249,58 @@ const ChatContainer = () => {
       <ChatHeader />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={message._id}
-            className={`chat ${
-              message.senderId === authUser._id ? "chat-end" : "chat-start"
-            }`}
-            ref={index === messages.length - 1 ? messageEndRef : null} // ✅ FIX
-          >
-            <div className="chat-image avatar">
-              <div className="size-10 rounded-full border">
-                <img
-                  src={
-                    message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
-                  }
-                  alt="profile"
-                />
+        {messages.map((message, index) => {
+          const normalizeId = (id) => {
+            if (id === null || id === undefined) return "";
+            if (typeof id === "string") return id;
+            if (typeof id === "object") {
+              if (id._id) return String(id._id);
+              if (typeof id.toString === "function") return id.toString();
+            }
+            return String(id);
+          };
+
+          const msgSenderId = normalizeId(message.senderId);
+          const isMine = msgSenderId === String(authUser._id);
+
+          return (
+            <div
+              key={message._id}
+              className={`chat ${isMine ? "chat-end" : "chat-start"}`}
+              ref={index === messages.length - 1 ? messageEndRef : null}
+            >
+              <div className="chat-image avatar">
+                <div className="size-10 rounded-full border">
+                  <img
+                    src={
+                      isMine
+                        ? authUser.profilePic || "/avatar.png"
+                        : selectedUser.profilePic || "/avatar.png"
+                    }
+                    alt="profile"
+                  />
+                </div>
+              </div>
+
+              <div className="chat-header mb-1">
+                <time className="text-xs opacity-50 ml-1">
+                  {formatMessageTime(message.createdAt)}
+                </time>
+              </div>
+
+              <div className="chat-bubble flex flex-col">
+                {message.image && (
+                  <img
+                    src={message.image}
+                    alt="Attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
+                {message.text && <p>{message.text}</p>}
               </div>
             </div>
-
-            <div className="chat-header mb-1">
-              <time className="text-xs opacity-50 ml-1">
-                {formatMessageTime(message.createdAt)}
-              </time>
-            </div>
-
-            <div className="chat-bubble flex flex-col">
-              {message.image && (
-                <img
-                  src={message.image}
-                  alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
-                />
-              )}
-              {message.text && <p>{message.text}</p>}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <MessageInput />
