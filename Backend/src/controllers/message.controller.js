@@ -4,6 +4,7 @@ import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import { scheduleMessageJob, cancelScheduledJob } from "../lib/messageQueue.js";
+import { cleanupOldMessages } from "../lib/cleanup.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
@@ -215,5 +216,25 @@ export const cancelScheduledMessage = async (req, res) => {
   } catch (error) {
     console.error("[cancelScheduledMessage] Error:", error.message);
     res.status(500).json({ error: "Failed to cancel message" });
+  }
+};
+
+/**
+ * Manual cleanup endpoint - trigger cleanup of messages older than 30 days
+ * This is useful for testing or manual maintenance
+ */
+export const triggerCleanup = async (req, res) => {
+  try {
+    console.log("[triggerCleanup] Manual cleanup triggered by user:", req.user._id);
+    
+    const result = await cleanupOldMessages();
+    
+    res.status(200).json({
+      message: "Cleanup completed successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("[triggerCleanup] Error:", error.message);
+    res.status(500).json({ error: "Failed to trigger cleanup" });
   }
 };
