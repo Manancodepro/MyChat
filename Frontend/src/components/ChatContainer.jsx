@@ -1,10 +1,10 @@
-import { useChatStore } from "../store/useChatStore";
+import { useChatStore } from "../store/useChatStore.js";
 import { useEffect, useRef, useState } from "react";
-import ChatHeader from "./ChatHeader";
-import MessageInput from "./MessageInput";
+import ChatHeader from "./ChatHeader.jsx";
+import MessageInput from "./MessageInput.jsx";
 import MessageSkeleton from "./Skeletons/MessageSkeleton.jsx";
-import { useAuthStore } from "../store/useAuthStore";
-import { formatMessageTime } from "../lib/utils";
+import { useAuthStore } from "../store/useAuthStore.js";
+import { formatMessageTime } from "../lib/utils.js";
 import { Clock, Trash2, MoreVertical, Play, Download } from "lucide-react";
 import { toast } from "react-hot-toast";
 import {

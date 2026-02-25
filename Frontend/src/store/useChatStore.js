@@ -69,7 +69,7 @@
 
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../lib/axios.js";
 import {
   addReaction as apiAddReaction,
   removeReaction as apiRemoveReaction,
@@ -78,7 +78,7 @@ import {
   deleteForEveryone as apiDeleteForEveryone,
   uploadFileMessage as apiUploadFileMessage,
 } from "../lib/messageApi.js";
-import { useAuthStore } from "./useAuthStore";
+import { useAuthStore } from "./useAuthStore.js";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
