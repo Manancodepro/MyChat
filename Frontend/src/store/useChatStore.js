@@ -70,6 +70,14 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
+import {
+  addReaction as apiAddReaction,
+  removeReaction as apiRemoveReaction,
+  editMessage as apiEditMessage,
+  deleteForMe as apiDeleteForMe,
+  deleteForEveryone as apiDeleteForEveryone,
+  uploadFileMessage as apiUploadFileMessage,
+} from "../lib/messageApi.js";
 import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
@@ -109,7 +117,27 @@ export const useChatStore = create((set, get) => ({
   refreshMessages: async (userId) => {
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
-      set({ messages: res.data });
+      const newMessages = res.data;
+
+      // Merge with existing messages to preserve local state
+      set((state) => {
+        const messageMap = new Map();
+
+        // First add existing messages
+        state.messages.forEach((msg) =>
+          messageMap.set(msg._id.toString(), msg),
+        );
+
+        // Then add/update with fresh data from backend
+        newMessages.forEach((msg) => messageMap.set(msg._id.toString(), msg));
+
+        // Convert back to array, maintaining order by timestamp
+        const merged = Array.from(messageMap.values()).sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+        );
+
+        return { messages: merged };
+      });
     } catch (error) {
       console.error("Failed to refresh messages:", error);
     }
@@ -189,6 +217,10 @@ export const useChatStore = create((set, get) => ({
     socket.off("messageCancelled");
     socket.off("scheduledMessageSent");
     socket.off("messageDelivered");
+    socket.off("reactionAdded");
+    socket.off("reactionRemoved");
+    socket.off("messageEdited");
+    socket.off("messageDeleted");
 
     // Handle real-time delivered scheduled messages
     socket.on("newMessage", (newMessage) => {
@@ -234,7 +266,7 @@ export const useChatStore = create((set, get) => ({
     });
 
     // Handle scheduled message confirmation
-    socket.on("messageScheduled", (data) => {
+    socket.on("messageScheduled", () => {
       toast.success("Message scheduled successfully");
     });
 
@@ -268,6 +300,58 @@ export const useChatStore = create((set, get) => ({
         ),
       }));
     });
+
+    // ===== NEW: Reaction events =====
+    socket.on("reactionAdded", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, reactions: data.reactions }
+            : msg,
+        ),
+      }));
+    });
+
+    socket.on("reactionRemoved", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, reactions: data.reactions }
+            : msg,
+        ),
+      }));
+    });
+
+    // ===== NEW: Edit event =====
+    socket.on("messageEdited", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? {
+                ...msg,
+                text: data.text,
+                isEdited: data.isEdited,
+                editedAt: data.editedAt,
+              }
+            : msg,
+        ),
+      }));
+    });
+
+    // ===== NEW: Delete event =====
+    socket.on("messageDeleted", (data) => {
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === data.messageId
+            ? {
+                ...msg,
+                deletedForEveryone: data.deletedForEveryone,
+                text: "This message was deleted",
+              }
+            : msg,
+        ),
+      }));
+    });
   },
 
   unsubscribeFromMessages: () => {
@@ -277,6 +361,84 @@ export const useChatStore = create((set, get) => ({
     socket.off("messageCancelled");
     socket.off("scheduledMessageSent");
     socket.off("messageDelivered");
+    socket.off("reactionAdded");
+    socket.off("reactionRemoved");
+    socket.off("messageEdited");
+    socket.off("messageDeleted");
+  },
+
+  // ===== NEW ACTIONS =====
+
+  addReaction: async (messageId, emoji) => {
+    try {
+      await apiAddReaction(messageId, emoji);
+      toast.success("Reaction added");
+    } catch (error) {
+      toast.error(error.error || "Failed to add reaction");
+    }
+  },
+
+  removeReaction: async (messageId) => {
+    try {
+      await apiRemoveReaction(messageId);
+    } catch (error) {
+      toast.error(error.error || "Failed to remove reaction");
+    }
+  },
+
+  editMessage: async (messageId, text) => {
+    try {
+      const res = await apiEditMessage(messageId, text);
+      toast.success("Message edited");
+      return res;
+    } catch (error) {
+      toast.error(error.error || "Failed to edit message");
+    }
+  },
+
+  deleteForMe: async (messageId) => {
+    try {
+      await apiDeleteForMe(messageId);
+      set((state) => ({
+        messages: state.messages.filter((msg) => msg._id !== messageId),
+      }));
+      toast.success("Message deleted");
+    } catch (error) {
+      toast.error(error.error || "Failed to delete message");
+    }
+  },
+
+  deleteForEveryone: async (messageId) => {
+    try {
+      await apiDeleteForEveryone(messageId);
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === messageId
+            ? {
+                ...msg,
+                deletedForEveryone: true,
+                text: "This message was deleted",
+              }
+            : msg,
+        ),
+      }));
+      toast.success("Message deleted for everyone");
+    } catch (error) {
+      toast.error(error.error || "Failed to delete message");
+    }
+  },
+
+  uploadFile: async (receiverId, file, text) => {
+    try {
+      const res = await apiUploadFileMessage(receiverId, file, text);
+      set((state) => ({
+        messages: [...state.messages, res],
+      }));
+      toast.success("File uploaded successfully");
+      return res;
+    } catch (error) {
+      toast.error(error.error || "Failed to upload file");
+    }
   },
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),

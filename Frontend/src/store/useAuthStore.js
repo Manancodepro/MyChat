@@ -264,13 +264,22 @@ export const useAuthStore = create((set, get) => ({
     const socket = io(BASE_URL, {
       auth: { userId: String(authUser._id) },
       query: { userId: String(authUser._id) },
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
     });
 
     socket.on("connect", () => {
-      console.log("[socket] connected", socket.id);
+      console.log("[socket] connected ✅", socket.id);
     });
+
     socket.on("connect_error", (err) => {
-      console.error("[socket] connect_error", err);
+      console.error("[socket] connect_error ❌", err);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("[socket] disconnected");
     });
 
     set({ socket: socket });
@@ -281,10 +290,10 @@ export const useAuthStore = create((set, get) => ({
         const ids = Array.isArray(userIds)
           ? userIds.map((id) => String(id))
           : [];
-        console.log("[socket] getOnlineUsers", ids);
+        console.log("[socket] getOnlineUsers 🟢", ids);
         set({ onlineUsers: ids });
       } catch (e) {
-        console.log("[socket] getOnlineUsers (raw)", userIds);
+        console.log("[socket] getOnlineUsers (raw) 🔴", userIds);
         set({ onlineUsers: userIds });
       }
     });

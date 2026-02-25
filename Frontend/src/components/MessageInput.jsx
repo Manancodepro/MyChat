@@ -1,71 +1,72 @@
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Image, Send, X, Clock } from "lucide-react";
+import { Send, Clock, Paperclip } from "lucide-react";
 import toast from "react-hot-toast";
 import ScheduleModal from "./ScheduleModal";
+import { uploadFileMessage } from "../lib/messageApi";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
-  const [imagePreview, setImagePreview] = useState(null);
-  const fileInputRef = useRef(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const { sendMessage, scheduleMessage, isScheduling } = useChatStore();
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeImage = () => {
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+  const { sendMessage, scheduleMessage, isScheduling, selectedUser } =
+    useChatStore();
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+    if (!text.trim()) return;
 
     try {
       await sendMessage({
         text: text.trim(),
-        image: imagePreview,
       });
 
-      // Clear form
       setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
     }
   };
 
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error("File size must be under 100MB");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      await uploadFileMessage(selectedUser._id, file, text.trim());
+      setText("");
+      toast.success("File sent successfully");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      toast.error("Failed to upload file");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleScheduleMessage = async (scheduledDateTime) => {
-    if (!text.trim() && !imagePreview) {
-      toast.error("Please add text or an image to schedule");
+    if (!text.trim()) {
+      toast.error("Please add text to schedule");
       return;
     }
 
     try {
       await scheduleMessage({
         text: text.trim(),
-        image: imagePreview,
         scheduledTime: scheduledDateTime,
       });
 
-      // Clear form
       setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
       setShowScheduleModal(false);
     } catch (error) {
       console.error("Failed to schedule message:", error);
@@ -74,28 +75,29 @@ const MessageInput = () => {
 
   return (
     <div className="p-4 w-full">
-      {imagePreview && (
-        <div className="mb-3 flex items-center gap-2">
-          <div className="relative">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
-            />
-            <button
-              onClick={removeImage}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
-              flex items-center justify-center"
-              type="button"
-            >
-              <X className="size-3" />
-            </button>
-          </div>
-        </div>
-      )}
-
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2">
+        {/* File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileSelect}
+          disabled={isUploading}
+          className="hidden"
+          accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.mp3,.wav,.mp4,.webm"
+        />
+
+        {/* File Picker Button */}
+        <button
+          type="button"
+          className="btn btn-sm btn-circle text-blue-400 hover:bg-blue-900 disabled:opacity-50"
+          title="Send file"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+        >
+          <Paperclip size={18} />
+        </button>
+
+        <div className="flex-1">
           <input
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
@@ -103,22 +105,6 @@ const MessageInput = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-          />
-
-          <button
-            type="button"
-            className={`hidden sm:flex btn btn-circle
-                     ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Image size={20} />
-          </button>
         </div>
 
         <button
@@ -134,7 +120,7 @@ const MessageInput = () => {
         <button
           type="submit"
           className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !imagePreview}
+          disabled={!text.trim()}
         >
           <Send size={22} />
         </button>
