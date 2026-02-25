@@ -6,7 +6,6 @@ import cors from "cors";
 import path from "path";
 
 import { connectDB } from "./lib/db.js";
-
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import { app, server } from "./lib/socket.js";
@@ -63,7 +62,7 @@ if (process.env.NODE_ENV === "production") {
 server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
-  
+
   // Schedule automatic cleanup of old messages (runs every 24 hours + initial run after 5 seconds)
   scheduleCleanup();
 });
