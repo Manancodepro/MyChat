@@ -58,7 +58,12 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  }),
+);
 server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
