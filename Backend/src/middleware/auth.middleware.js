@@ -3,15 +3,25 @@ import User from "../models/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt; // we write here jwt because in utils.js while setting cookie we set the cookie name as jwt
+    // First try to get token from cookies (for backward compatibility)
+    let token = req.cookies.jwt;
+
+    // If not in cookies, try Authorization header
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.slice(7); // Remove "Bearer " prefix
+      }
+    }
+
     console.log("[protectRoute] Checking token...", {
       tokenExists: !!token,
-      cookies: req.cookies,
-      headers: req.headers.cookie,
+      fromCookie: !!req.cookies.jwt,
+      fromHeader: !!req.headers.authorization,
     });
-    
+
     if (!token) {
-      console.log("[protectRoute] No token found in cookies");
+      console.log("[protectRoute] No token found in cookies or headers");
       return res
         .status(401)
         .json({ message: "Not authorized, no token provided" });
@@ -23,13 +33,13 @@ export const protectRoute = async (req, res, next) => {
       return res.status(401).json({ message: "Not authorized, invalid token" });
     }
 
-    const user = await User.findById(decoded.userId).select("-password"); // fetching user from database excluding password field
+    const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
     req.user = user;
-    next(); // calling next middleware or controller
+    next();
   } catch (error) {
     console.log("Error in protectRoute middleware", error.message);
     return res.status(500).json({ message: "Internal server error" });

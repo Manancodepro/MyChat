@@ -172,9 +172,10 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const SOCKET_URL =
-  import.meta.env.MODE === "development" 
-    ? "http://localhost:8001" 
-    : (import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || window.location.origin);
+  import.meta.env.MODE === "development"
+    ? "http://localhost:8001"
+    : import.meta.env.VITE_BACKEND_URL?.replace("/api", "") ||
+      window.location.origin;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -187,13 +188,23 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axiosInstance.get("/auth/check-auth");
+      // First check if token exists in localStorage
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.log(
+          "[checkAuth] No token in localStorage, skipping auth check",
+        );
+        set({ isCheckingAuth: false });
+        return;
+      }
 
+      const res = await axiosInstance.get("/auth/check-auth");
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
       set({ authUser: null });
+      localStorage.removeItem("authToken"); // ✅ Remove invalid token
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -204,6 +215,9 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
+      if (res.data.token) {
+        localStorage.setItem("authToken", res.data.token); // ✅ Store token in localStorage
+      }
       toast.success("Account created successfully");
       get().connectSocket();
     } catch (error) {
@@ -218,6 +232,9 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
+      if (res.data.token) {
+        localStorage.setItem("authToken", res.data.token); // ✅ Store token in localStorage
+      }
       toast.success("Logged in successfully");
 
       get().connectSocket();
@@ -232,6 +249,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      localStorage.removeItem("authToken"); // ✅ Remove token from localStorage
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {

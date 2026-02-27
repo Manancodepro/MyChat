@@ -33,7 +33,7 @@ export const signup = async (req, res) => {
 
     if (newUser) {
       //generate jwt token here and send it to the user
-      generateToken(newUser._id, res);
+      const token = generateToken(newUser._id, res);
       await newUser.save();
 
       res.status(201).json({
@@ -41,6 +41,7 @@ export const signup = async (req, res) => {
         fullName: newUser.fullName, // sending only necessary user details in response
         email: newUser.email,
         profilePic: newUser.profilePic,
+        token: token, // ✅ Include token in response for localStorage
       }); // 201 created because new resource is created
     } else {
       res.status(400).json({ message: "Ivalid user data" });
@@ -63,15 +64,15 @@ export const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    generateToken(user._id, res);
+    const token = generateToken(user._id, res);
     console.log("[auth] Login successful for user:", user.email);
-    console.log("[auth] Set-Cookie header should be in response");
 
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      token: token, // ✅ Include token in response for localStorage
     });
   } catch (error) {
     console.log("Error in Login controller", error.message);
@@ -82,7 +83,7 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   // res.send("Logout route");
   try {
-    res.cookie("jwt", "", { 
+    res.cookie("jwt", "", {
       path: "/",
       maxAge: 0,
       httpOnly: true,

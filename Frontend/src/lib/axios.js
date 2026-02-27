@@ -18,10 +18,14 @@ export const axiosInstance = axios.create({
 
 // Debug interceptor
 axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   console.log("[axios interceptor] Request:", {
     url: config.url,
     method: config.method,
-    withCredentials: config.withCredentials,
+    hasToken: !!token,
     cookies: document.cookie,
   });
   return config;
@@ -34,7 +38,6 @@ axiosInstance.interceptors.response.use(
       url: response.config.url,
       status: response.status,
       "set-cookie": setCookie,
-      allHeaders: response.headers,
     });
     return response;
   },

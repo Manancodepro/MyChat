@@ -5,13 +5,14 @@ export const generateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
+  // Still set the cookie for backward compatibility
   res.cookie("jwt", token, {
     path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // MS
-    httpOnly: true, // prevent XSS attacks cross-site scripting attacks
-    sameSite: "none", // "none" required for cross-origin requests on Render
-    secure: true, // HTTPS required on Render (production)
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
   });
 
-  return token;
+  return token; // ✅ Also return the token for localStorage
 };
