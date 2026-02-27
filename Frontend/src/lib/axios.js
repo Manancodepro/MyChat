@@ -5,11 +5,12 @@ const API_BASE_URL =
     ? "http://localhost:8001/api"
     : import.meta.env.VITE_BACKEND_URL
       ? `${import.meta.env.VITE_BACKEND_URL}/api`
-      : "/api";
+      : `${window.location.protocol}//${window.location.hostname}.onrender.com:${import.meta.env.VITE_BACKEND_PORT || 8001}/api`;
 
 console.log("[axios] API_BASE_URL:", API_BASE_URL);
 console.log("[axios] MODE:", import.meta.env.MODE);
 console.log("[axios] VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL);
+console.log("[axios] window.location:", window.location.origin);
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
