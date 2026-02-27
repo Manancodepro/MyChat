@@ -171,8 +171,10 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:8001" : "/";
+const SOCKET_URL =
+  import.meta.env.MODE === "development" 
+    ? "http://localhost:8001" 
+    : import.meta.env.VITE_BACKEND_URL || window.location.origin;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -256,12 +258,12 @@ export const useAuthStore = create((set, get) => ({
     if (!authUser || get().socket?.connected) return;
 
     console.log("[useAuthStore] connectSocket ->", {
-      BASE_URL,
+      SOCKET_URL,
       authUserId: authUser?._id,
     });
 
     // Send userId via socket auth (preferred) and query (fallback)
-    const socket = io(BASE_URL, {
+    const socket = io(SOCKET_URL, {
       auth: { userId: String(authUser._id) },
       query: { userId: String(authUser._id) },
       reconnection: true,
