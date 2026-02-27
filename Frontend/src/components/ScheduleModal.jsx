@@ -42,42 +42,42 @@ const ScheduleModal = ({ isOpen, onClose, onSchedule, isLoading }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="modal modal-open">
-        <div className="modal-box w-96 bg-slate-800 text-white">
-          <div className="flex items-center justify-between mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-3 sm:p-0">
+      <div className="modal modal-open w-full sm:w-auto">
+        <div className="modal-box w-full sm:w-96 bg-slate-800 text-white">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
-              <Clock size={20} className="text-cyan-400" />
-              <h3 className="font-bold text-lg">Schedule Message</h3>
+              <Clock size={18} className="sm:w-5 sm:h-5 text-cyan-400" />
+              <h3 className="font-bold text-base sm:text-lg">Schedule Message</h3>
             </div>
             <button
               onClick={resetForm}
-              className="btn btn-circle btn-ghost btn-sm"
+              className="btn btn-circle btn-ghost btn-sm btn-xs"
             >
               <X size={16} />
             </button>
           </div>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-3 sm:py-4">
             {/* Date Picker */}
             <div className="form-control">
-              <label className="label">
-                <span className="label-text text-white">Select Date</span>
+              <label className="label py-1 sm:py-2">
+                <span className="label-text text-white text-xs sm:text-sm">Select Date</span>
               </label>
               <DatePicker
                 selected={selectedDate}
                 onChange={(date) => setSelectedDate(date)}
                 minDate={new Date()}
                 dateFormat="yyyy-MM-dd"
-                className="input input-bordered input-sm w-full bg-slate-700 text-white border-slate-600"
+                className="input input-bordered input-xs sm:input-sm w-full bg-slate-700 text-white border-slate-600 text-xs sm:text-sm"
                 placeholderText="Click to select date"
               />
             </div>
 
             {/* Time Picker */}
             <div className="form-control">
-              <label className="label">
-                <span className="label-text text-white">Select Time (UTC)</span>
+              <label className="label py-1 sm:py-2">
+                <span className="label-text text-white text-xs sm:text-sm">Select Time (UTC)</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -89,11 +89,11 @@ const ScheduleModal = ({ isOpen, onClose, onSchedule, isLoading }) => {
                     newTime.setHours(parseInt(hours), parseInt(minutes));
                     setSelectedTime(newTime);
                   }}
-                  className="input input-bordered input-sm w-full bg-slate-700 text-white border-slate-600"
+                  className="input input-bordered input-xs sm:input-sm w-full bg-slate-700 text-white border-slate-600 text-xs sm:text-sm"
                 />
               </div>
-              <label className="label">
-                <span className="label-text-alt text-gray-400">
+              <label className="label py-1">
+                <span className="label-text-alt text-gray-400 text-xs sm:text-xs">
                   Timezone: UTC
                 </span>
               </label>
@@ -101,7 +101,7 @@ const ScheduleModal = ({ isOpen, onClose, onSchedule, isLoading }) => {
 
             {/* Preview */}
             {selectedDate && (
-              <div className="alert alert-info bg-slate-700 border border-slate-600 text-sm text-white">
+              <div className="alert alert-info bg-slate-700 border border-slate-600 text-xs sm:text-sm text-white p-2 sm:p-3">
                 <span>
                   Scheduled for:{" "}
                   <strong>
@@ -118,23 +118,23 @@ const ScheduleModal = ({ isOpen, onClose, onSchedule, isLoading }) => {
           </div>
 
           {/* Buttons */}
-          <div className="modal-action">
+          <div className="modal-action gap-2">
             <button
               onClick={resetForm}
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-xs sm:btn-sm"
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               onClick={handleSchedule}
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-xs sm:btn-sm"
               disabled={!selectedDate || isLoading}
             >
               {isLoading ? (
                 <>
-                  <span className="loading loading-spinner loading-sm"></span>
-                  Scheduling...
+                  <span className="loading loading-spinner loading-xs sm:loading-sm"></span>
+                  <span className="hidden xs:inline">Scheduling...</span>
                 </>
               ) : (
                 "Schedule"

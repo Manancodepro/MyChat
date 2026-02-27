@@ -114,14 +114,14 @@ const Sidebar = () => {
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b border-base-300 w-full p-5">
+    <aside className="h-full w-16 sm:w-20 md:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
+      <div className="border-b border-base-300 w-full p-2.5 sm:p-4 md:p-5">
         <div className="flex items-center gap-2">
-          <Users className="size-6" />
-          <span className="font-medium hidden lg:block">Contacts</span>
+          <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span className="font-medium hidden md:block text-sm">Contacts</span>
         </div>
-        {/* TODO: Online filter toggle */}
-        <div className="mt-3 hidden lg:flex items-center gap-2">
+        {/* Online filter toggle - Desktop only */}
+        <div className="mt-3 hidden md:flex items-center gap-2">
           <label className="cursor-pointer flex items-center gap-2">
             <input
               type="checkbox"
@@ -131,7 +131,7 @@ const Sidebar = () => {
             />
             <span className="text-sm">Show online only</span>
           </label>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-base-content/50">
             (
             {
               onlineUsers.filter((id) => String(id) !== String(authUser?._id))
@@ -148,29 +148,30 @@ const Sidebar = () => {
             key={user._id}
             onClick={() => setSelectedUser(user)}
             className={`
-              w-full p-3 flex items-center gap-3
+              w-full p-2 sm:p-3 flex items-center gap-2 sm:gap-3
               hover:bg-base-300 transition-colors
               ${String(selectedUser?._id) === String(user._id) ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
+            title={user.fullName}
           >
-            <div className="relative mx-auto lg:mx-0">
+            <div className="relative flex-shrink-0 mx-auto sm:mx-0">
               <img
                 src={user.profilePic || "/avatar.png"}
                 alt={user.name}
-                className="size-12 object-cover rounded-full"
+                className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full"
               />
               {onlineUsers.includes(String(user._id)) && (
                 <span
-                  className="absolute bottom-0 right-0 size-3 bg-green-500 
-                  rounded-full ring-2 ring-zinc-900"
+                  className="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 
+                  rounded-full ring-1 sm:ring-2 ring-base-100"
                 />
               )}
             </div>
 
             {/* User info - only visible on larger screens */}
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullName}</div>
-              <div className="text-sm text-zinc-400">
+            <div className="hidden sm:block text-left min-w-0 flex-1">
+              <div className="font-medium truncate text-sm">{user.fullName}</div>
+              <div className="text-xs text-base-content/60">
                 {onlineUsers.includes(String(user._id)) ? "Online" : "Offline"}
               </div>
             </div>
@@ -178,10 +179,11 @@ const Sidebar = () => {
         ))}
 
         {filteredUsers.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
+          <div className="text-center text-base-content/50 py-4 text-sm">No users</div>
         )}
       </div>
     </aside>
   );
 };
 export default Sidebar;
+

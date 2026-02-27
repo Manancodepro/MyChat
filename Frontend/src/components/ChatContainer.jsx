@@ -76,7 +76,7 @@ const AudioPlayer = ({ src, fileName }) => {
   };
 
   return (
-    <div className="mt-2 bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-4 w-72 max-w-sm shadow-lg border border-slate-600">
+    <div className="mt-2 bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-3 sm:p-4 w-full sm:w-72 max-w-sm shadow-lg border border-slate-600">
       <audio
         ref={audioRef}
         src={src}
@@ -84,12 +84,12 @@ const AudioPlayer = ({ src, fileName }) => {
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
       />
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={togglePlay}
-          className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
+          className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
         >
-          <span className="text-white">{isPlaying ? "⏸" : "▶"}</span>
+          <span className="text-white text-sm sm:text-base">{isPlaying ? "⏸" : "▶"}</span>
         </button>
         <div className="flex-1 min-w-0">
           <input
@@ -103,13 +103,13 @@ const AudioPlayer = ({ src, fileName }) => {
               background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #475569 ${(currentTime / duration) * 100}%, #475569 100%)`,
             }}
           />
-          <div className="flex justify-between text-xs text-gray-300 mt-2">
-            <span className="font-medium">{formatTime(currentTime)}</span>
-            <span className="font-medium">{formatTime(duration)}</span>
+          <div className="flex justify-between text-xs text-gray-300 mt-1 sm:mt-2">
+            <span className="font-medium text-xs sm:text-xs">{formatTime(currentTime)}</span>
+            <span className="font-medium text-xs sm:text-xs">{formatTime(duration)}</span>
           </div>
         </div>
       </div>
-      <p className="text-xs text-gray-300 mt-3 truncate text-center font-medium">
+      <p className="text-xs text-gray-300 mt-2 sm:mt-3 truncate text-center font-medium">
         {fileName}
       </p>
     </div>
@@ -162,7 +162,7 @@ const VideoPlayer = ({ src, fileName }) => {
   };
 
   return (
-    <div className="mt-2 max-w-sm rounded-2xl overflow-hidden shadow-lg border border-slate-600">
+    <div className="mt-2 max-w-full sm:max-w-sm rounded-2xl overflow-hidden shadow-lg border border-slate-600">
       <div className="bg-black relative group">
         <video
           ref={videoRef}
@@ -175,19 +175,19 @@ const VideoPlayer = ({ src, fileName }) => {
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
           <button
             onClick={togglePlay}
-            className="p-4 bg-blue-600 hover:bg-blue-700 rounded-full transition opacity-0 group-hover:opacity-100 shadow-lg transform hover:scale-110"
+            className="p-3 sm:p-4 bg-blue-600 hover:bg-blue-700 rounded-full transition opacity-0 group-hover:opacity-100 shadow-lg transform hover:scale-110"
           >
-            <span className="text-white text-xl">{isPlaying ? "⏸" : "▶"}</span>
+            <span className="text-white text-lg sm:text-xl">{isPlaying ? "⏸" : "▶"}</span>
           </button>
         </div>
       </div>
-      <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3">
-        <div className="flex items-center gap-3">
+      <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-2 sm:p-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={togglePlay}
-            className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0"
+            className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0"
           >
-            <span className="text-white text-sm">{isPlaying ? "⏸" : "▶"}</span>
+            <span className="text-white text-xs sm:text-sm">{isPlaying ? "⏸" : "▶"}</span>
           </button>
           <div className="flex-1 min-w-0">
             <input
@@ -202,12 +202,12 @@ const VideoPlayer = ({ src, fileName }) => {
               }}
             />
             <div className="flex justify-between text-xs text-gray-300 mt-1">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
+              <span className="text-xs">{formatTime(currentTime)}</span>
+              <span className="text-xs">{formatTime(duration)}</span>
             </div>
           </div>
         </div>
-        <p className="text-xs text-gray-300 mt-2 truncate text-center font-medium">
+        <p className="text-xs text-gray-300 mt-1 sm:mt-2 truncate text-center font-medium">
           {fileName}
         </p>
       </div>
@@ -386,7 +386,7 @@ const ChatContainer = () => {
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 relative">
         {messages
           .filter((message) => {
             // Only show messages for the selected user
@@ -443,7 +443,7 @@ const ChatContainer = () => {
                 onMouseLeave={() => setHoveredMessageId(null)}
               >
                 <div className="chat-image avatar">
-                  <div className="size-10 rounded-full border">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border">
                     <img
                       src={
                         isMine
@@ -463,8 +463,8 @@ const ChatContainer = () => {
                   </div>
                 </div>
 
-                <div className="chat-header mb-1">
-                  <time className="text-xs opacity-50 ml-1">
+                <div className="chat-header mb-0.5 sm:mb-1">
+                  <time className="text-xs opacity-50 ml-0.5 sm:ml-1">
                     {message.status === "scheduled"
                       ? `Scheduled: ${formatMessageTime(message.scheduledTime)}`
                       : message.status === "sent" && message.deliveredAt
@@ -485,8 +485,8 @@ const ChatContainer = () => {
                   >
                     {isScheduled && (
                       <div className="flex items-center gap-1 mb-2 text-orange-300 text-xs">
-                        <Clock size={14} />
-                        <span>
+                        <Clock size={12} className="sm:w-4 sm:h-4" />
+                        <span className="text-xs sm:text-xs leading-tight">
                           Scheduled for{" "}
                           {new Date(message.scheduledTime).toLocaleString()}
                         </span>
@@ -500,36 +500,38 @@ const ChatContainer = () => {
                     )}
 
                     {isDeletedForEveryone ? (
-                      <p className="text-gray-400 italic">
+                      <p className="text-xs sm:text-sm text-gray-400 italic">
                         This message was deleted
                       </p>
                     ) : editingMessageId === message._id ? (
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-2 w-full sm:w-auto">
                         <input
                           type="text"
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
-                          className="flex-1 px-2 py-1 bg-slate-700 rounded text-sm"
+                          className="flex-1 px-2 py-1 bg-slate-700 rounded text-xs sm:text-sm"
                           placeholder="Edit message..."
                           autoFocus
                         />
-                        <button
-                          onClick={handleEditMessage}
-                          className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-xs"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingMessageId(null)}
-                          className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
-                        >
-                          Cancel
-                        </button>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={handleEditMessage}
+                            className="px-2 sm:px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-xs"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingMessageId(null)}
+                            className="px-2 sm:px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <>
                         {message.text && (
-                          <p className="break-words text-sm md:text-base leading-snug max-w-xs sm:max-w-sm overflow-hidden">
+                          <p className="break-words text-xs sm:text-sm leading-snug max-w-xs sm:max-w-sm overflow-hidden">
                             {message.text}
                           </p>
                         )}
@@ -537,7 +539,7 @@ const ChatContainer = () => {
                         {message.file && (
                           <>
                             {message.file.type === "image" && (
-                              <div className="mt-2 max-w-sm">
+                              <div className="mt-2 w-full max-w-xs sm:max-w-sm">
                                 <a
                                   href={message.file.url}
                                   download={message.file.name}
@@ -563,7 +565,7 @@ const ChatContainer = () => {
                                     {/* Overlay on hover */}
                                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-2xl transition-all duration-300 flex items-center justify-center">
                                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <Download className="w-8 h-8 text-white drop-shadow-lg" />
+                                        <Download className="w-6 h-6 sm:w-8 sm:h-8 text-white drop-shadow-lg" />
                                       </div>
                                     </div>
                                   </div>
@@ -594,23 +596,23 @@ const ChatContainer = () => {
                                 download={message.file.name}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block mt-2 max-w-sm group cursor-pointer"
+                                className="block mt-2 w-full max-w-xs sm:max-w-sm group cursor-pointer"
                               >
-                                <div className="p-4 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl shadow-lg border border-slate-600 hover:border-slate-500 hover:shadow-xl transition-all duration-300 group-hover:from-slate-600 group-hover:to-slate-700">
-                                  <div className="flex items-start gap-3">
-                                    <div className="p-3 bg-blue-600/20 rounded-xl flex-shrink-0 group-hover:bg-blue-500/30 transition-colors">
-                                      <span className="text-2xl">📄</span>
+                                <div className="p-3 sm:p-4 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl shadow-lg border border-slate-600 hover:border-slate-500 hover:shadow-xl transition-all duration-300 group-hover:from-slate-600 group-hover:to-slate-700">
+                                  <div className="flex items-start gap-2 sm:gap-3">
+                                    <div className="p-2 sm:p-3 bg-blue-600/20 rounded-xl flex-shrink-0 group-hover:bg-blue-500/30 transition-colors">
+                                      <span className="text-lg sm:text-2xl">📄</span>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-bold text-white truncate group-hover:text-blue-200 transition-colors">
+                                      <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-blue-200 transition-colors">
                                         {message.file.name}
                                       </p>
                                       <p className="text-xs text-gray-400 mt-1">
                                         {formatFileSize(message.file.size)}
                                       </p>
                                     </div>
-                                    <div className="flex-shrink-0 p-2 bg-blue-600/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity group-hover:bg-blue-500/30">
-                                      <Download className="w-4 h-4 text-blue-300" />
+                                    <div className="flex-shrink-0 p-1.5 sm:p-2 bg-blue-600/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity group-hover:bg-blue-500/30">
+                                      <Download className="w-3 h-3 sm:w-4 sm:h-4 text-blue-300" />
                                     </div>
                                   </div>
                                 </div>

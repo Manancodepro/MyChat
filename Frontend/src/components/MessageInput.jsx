@@ -74,8 +74,8 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="p-4 w-full">
-      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+    <div className="p-2 sm:p-3 md:p-4 w-full">
+      <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 sm:gap-2">
         {/* File Input */}
         <input
           ref={fileInputRef}
@@ -89,18 +89,18 @@ const MessageInput = () => {
         {/* File Picker Button */}
         <button
           type="button"
-          className="btn btn-sm btn-circle text-blue-400 hover:bg-blue-900 disabled:opacity-50"
+          className="btn btn-xs sm:btn-sm btn-circle text-blue-400 hover:bg-blue-900 disabled:opacity-50 flex-shrink-0"
           title="Send file"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
         >
-          <Paperclip size={18} />
+          <Paperclip size={16} className="sm:w-5 sm:h-5" />
         </button>
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full input input-bordered rounded-lg input-xs sm:input-sm"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -109,20 +109,20 @@ const MessageInput = () => {
 
         <button
           type="button"
-          className="btn btn-sm btn-circle text-orange-400 hover:bg-orange-900"
+          className="btn btn-xs sm:btn-sm btn-circle text-orange-400 hover:bg-orange-900 flex-shrink-0"
           title="Schedule Message"
           onClick={() => setShowScheduleModal(true)}
           disabled={isScheduling}
         >
-          <Clock size={18} />
+          <Clock size={16} className="sm:w-5 sm:h-5" />
         </button>
 
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-xs sm:btn-sm btn-circle flex-shrink-0"
           disabled={!text.trim()}
         >
-          <Send size={22} />
+          <Send size={16} className="sm:w-5 sm:h-5" />
         </button>
       </form>
 
