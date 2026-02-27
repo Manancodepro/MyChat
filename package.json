@@ -8,10 +8,10 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
-    "build":"npm ci --prefix Backend && npm ci --prefix Frontend && npm run build --prefix Frontend",
+    "build":"npm install --prefix Backend && npm ci --prefix Frontend && npm run build --prefix Frontend",
     "start":"npm run start --prefix Backend"
   },
-  "repository": {
+  "repository": { 
     "type": "git",
     "url": "git+https://github.com/Manancodepro/MyChat.git"
   },
