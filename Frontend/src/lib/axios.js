@@ -13,3 +13,33 @@ export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
+
+// Debug interceptor
+axiosInstance.interceptors.request.use((config) => {
+  console.log("[axios interceptor] Request:", {
+    url: config.url,
+    method: config.method,
+    baseURL: config.baseURL,
+    withCredentials: config.withCredentials,
+  });
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log("[axios interceptor] Response:", {
+      url: response.config.url,
+      status: response.status,
+      headers: response.headers,
+    });
+    return response;
+  },
+  (error) => {
+    console.log("[axios interceptor] Error:", {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+    });
+    return Promise.reject(error);
+  }
+);
