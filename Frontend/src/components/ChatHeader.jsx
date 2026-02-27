@@ -1,10 +1,10 @@
-import { X, Smile, Bell } from "lucide-react";
+import { X, Smile, Bell, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import { useState } from "react";
 import NotificationBell from "./NotificationBell";
 
-const ChatHeader = () => {
+const ChatHeader = ({ onBack }) => {
   const { selectedUser, setSelectedUser, sendMessage } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -109,6 +109,17 @@ const ChatHeader = () => {
     <div className="p-2 sm:p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between gap-2 sm:gap-3">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Back Button Mobile */}
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="md:hidden p-1 hover:bg-base-200 rounded transition"
+              title="Back to chat list"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          
           {/* Avatar */}
           <div className="avatar flex-shrink-0">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full relative">

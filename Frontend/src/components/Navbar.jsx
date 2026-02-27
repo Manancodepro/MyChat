@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../store/useChatStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 import NotificationBell from "./NotificationBell.jsx";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+  const { setSelectedUser } = useChatStore();
+
+  const handleLogout = async () => {
+    setSelectedUser(null); // Clear selected user so it shows welcome page
+    await logout();
+  };
 
   return (
     <header
@@ -48,7 +55,7 @@ const Navbar = () => {
                   <span className="hidden sm:inline text-xs">Profile</span>
                 </Link>
 
-                <button className="btn btn-sm gap-2 flex items-center" onClick={logout} title="Logout">
+                <button className="btn btn-sm gap-2 flex items-center" onClick={handleLogout} title="Logout">
                   <LogOut className="w-4 h-4" />
                   <span className="hidden sm:inline text-xs">Logout</span>
                 </button>

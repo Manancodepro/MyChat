@@ -89,7 +89,9 @@ const AudioPlayer = ({ src, fileName }) => {
           onClick={togglePlay}
           className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
         >
-          <span className="text-white text-sm sm:text-base">{isPlaying ? "⏸" : "▶"}</span>
+          <span className="text-white text-sm sm:text-base">
+            {isPlaying ? "⏸" : "▶"}
+          </span>
         </button>
         <div className="flex-1 min-w-0">
           <input
@@ -104,8 +106,12 @@ const AudioPlayer = ({ src, fileName }) => {
             }}
           />
           <div className="flex justify-between text-xs text-gray-300 mt-1 sm:mt-2">
-            <span className="font-medium text-xs sm:text-xs">{formatTime(currentTime)}</span>
-            <span className="font-medium text-xs sm:text-xs">{formatTime(duration)}</span>
+            <span className="font-medium text-xs sm:text-xs">
+              {formatTime(currentTime)}
+            </span>
+            <span className="font-medium text-xs sm:text-xs">
+              {formatTime(duration)}
+            </span>
           </div>
         </div>
       </div>
@@ -177,7 +183,9 @@ const VideoPlayer = ({ src, fileName }) => {
             onClick={togglePlay}
             className="p-3 sm:p-4 bg-blue-600 hover:bg-blue-700 rounded-full transition opacity-0 group-hover:opacity-100 shadow-lg transform hover:scale-110"
           >
-            <span className="text-white text-lg sm:text-xl">{isPlaying ? "⏸" : "▶"}</span>
+            <span className="text-white text-lg sm:text-xl">
+              {isPlaying ? "⏸" : "▶"}
+            </span>
           </button>
         </div>
       </div>
@@ -187,7 +195,9 @@ const VideoPlayer = ({ src, fileName }) => {
             onClick={togglePlay}
             className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition flex-shrink-0"
           >
-            <span className="text-white text-xs sm:text-sm">{isPlaying ? "⏸" : "▶"}</span>
+            <span className="text-white text-xs sm:text-sm">
+              {isPlaying ? "⏸" : "▶"}
+            </span>
           </button>
           <div className="flex-1 min-w-0">
             <input
@@ -215,7 +225,7 @@ const VideoPlayer = ({ src, fileName }) => {
   );
 };
 
-const ChatContainer = () => {
+const ChatContainer = ({ onBack }) => {
   const {
     messages,
     getMessages,
@@ -374,8 +384,8 @@ const ChatContainer = () => {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col overflow-auto">
-        <ChatHeader />
+      <div className="flex w-full h-full flex-col overflow-hidden">
+        <ChatHeader onBack={onBack} />
         <MessageSkeleton />
         <MessageInput />
       </div>
@@ -383,8 +393,8 @@ const ChatContainer = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-auto">
-      <ChatHeader />
+    <div className="flex w-full h-full flex-col overflow-hidden">
+      <ChatHeader onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 relative">
         {messages
@@ -601,7 +611,9 @@ const ChatContainer = () => {
                                 <div className="p-3 sm:p-4 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl shadow-lg border border-slate-600 hover:border-slate-500 hover:shadow-xl transition-all duration-300 group-hover:from-slate-600 group-hover:to-slate-700">
                                   <div className="flex items-start gap-2 sm:gap-3">
                                     <div className="p-2 sm:p-3 bg-blue-600/20 rounded-xl flex-shrink-0 group-hover:bg-blue-500/30 transition-colors">
-                                      <span className="text-lg sm:text-2xl">📄</span>
+                                      <span className="text-lg sm:text-2xl">
+                                        📄
+                                      </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-blue-200 transition-colors">
