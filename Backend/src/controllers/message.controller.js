@@ -275,8 +275,14 @@ export const uploadFileMessage = async (req, res) => {
     // Validate file
     const validation = validateFileUpload(req.file);
 
+    // ✅ Generate absolute URL for file access
+    const protocol = req.protocol;
+    const host = req.get("host");
+    const baseUrl = `${protocol}://${host}`;
+    const fileUrl = `${baseUrl}/uploads/${validation.fileType}/${req.file.filename}`;
+
     const fileMetadata = {
-      url: `/uploads/${validation.fileType}/${req.file.filename}`,
+      url: fileUrl, // ✅ Use absolute URL
       name: req.file.originalname,
       size: req.file.size,
       mimeType: req.file.mimetype,
