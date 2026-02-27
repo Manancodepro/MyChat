@@ -31,6 +31,7 @@ app.use(
       "Authorization",
       "cookie",
     ],
+    exposedHeaders: ["Set-Cookie"], // ✅ EXPOSE Set-Cookie header so browser can read it
   }),
 );
 
