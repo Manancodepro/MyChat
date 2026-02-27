@@ -9,8 +9,8 @@ export const generateToken = (userId, res) => {
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // MS
     httpOnly: true, // prevent XSS attacks cross-site scripting attacks
-    sameSite: process.env.NODE_ENV === "development" ? "lax" : "none", // "none" required for cross-origin
-    secure: process.env.NODE_ENV !== "development", // HTTPS only in production
+    sameSite: "none", // "none" required for cross-origin requests on Render
+    secure: true, // HTTPS required on Render (production)
   });
 
   return token;
