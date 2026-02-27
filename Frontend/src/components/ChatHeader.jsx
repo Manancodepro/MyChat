@@ -106,20 +106,20 @@ const ChatHeader = ({ onBack }) => {
   };
 
   return (
-    <div className="p-2 sm:p-2.5 border-b border-base-300">
-      <div className="flex items-center justify-between gap-2 sm:gap-3">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+    <div className="p-2 sm:p-3 border-b border-base-300 bg-base-100">
+      <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap sm:flex-nowrap min-h-[56px]">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {/* Back Button Mobile */}
           {onBack && (
             <button
               onClick={onBack}
-              className="md:hidden p-1 hover:bg-base-200 rounded transition"
+              className="md:hidden p-1 hover:bg-base-200 rounded transition flex-shrink-0"
               title="Back to chat list"
             >
               <ArrowLeft size={20} />
             </button>
           )}
-          
+
           {/* Avatar */}
           <div className="avatar flex-shrink-0">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full relative">
@@ -130,9 +130,11 @@ const ChatHeader = ({ onBack }) => {
             </div>
           </div>
 
-          {/* User info - hidden on very small screens */}
-          <div className="min-w-0">
-            <h3 className="font-medium text-sm sm:text-base truncate">{selectedUser.fullName}</h3>
+          {/* User info - proper truncation */}
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium text-sm sm:text-base truncate">
+              {selectedUser.fullName}
+            </h3>
             <p className="text-xs sm:text-sm text-base-content/70">
               {onlineUsers.includes(String(selectedUser._id))
                 ? "Online"
@@ -141,17 +143,18 @@ const ChatHeader = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Notification Bell - New */}
-        <div className="hidden sm:flex">
-          <NotificationBell />
-        </div>
-
-        {/* Emoji & Close buttons */}
+        {/* Right side buttons - notification and actions */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          <div className="relative">
+          {/* Notification Bell - New */}
+          <div className="hidden sm:flex">
+            <NotificationBell />
+          </div>
+
+          {/* Emoji button */}
+          <div className="relative flex-shrink-0">
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-1.5 sm:p-2 rounded-full hover:bg-base-200 transition"
+              className="p-1.5 sm:p-2 rounded-full hover:bg-base-200 transition flex-shrink-0"
               title="Send emoji"
             >
               <Smile size={18} className="sm:w-5 sm:h-5" />
@@ -204,9 +207,10 @@ const ChatHeader = ({ onBack }) => {
             )}
           </div>
 
+          {/* Close button */}
           <button
             onClick={() => setSelectedUser(null)}
-            className="p-1.5 sm:p-2 rounded-full hover:bg-base-200 transition"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-base-200 transition flex-shrink-0"
             title="Close chat"
           >
             <X size={18} className="sm:w-5 sm:h-5" />

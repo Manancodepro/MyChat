@@ -393,8 +393,10 @@ const ChatContainer = ({ onBack }) => {
   }
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden">
-      <ChatHeader onBack={onBack} />
+    <div className="flex w-full h-full flex-col overflow-hidden bg-base-100">
+      <div className="flex-shrink-0 w-full">
+        <ChatHeader onBack={onBack} />
+      </div>
 
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 relative">
         {messages
@@ -746,7 +748,9 @@ const ChatContainer = ({ onBack }) => {
         )}
       </div>
 
-      <MessageInput />
+      <div className="flex-shrink-0 w-full border-t border-base-300">
+        <MessageInput />
+      </div>
     </div>
   );
 };
