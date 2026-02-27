@@ -18,10 +18,12 @@ export const protectRoute = async (req, res, next) => {
       tokenExists: !!token,
       fromCookie: !!req.cookies.jwt,
       fromHeader: !!req.headers.authorization,
+      authHeaderValue: req.headers.authorization ? req.headers.authorization.slice(0, 30) + "..." : "none",
+      allHeaders: Object.keys(req.headers),
     });
 
     if (!token) {
-      console.log("[protectRoute] No token found in cookies or headers");
+      console.log("[protectRoute] ❌ No token found in cookies or headers");
       return res
         .status(401)
         .json({ message: "Not authorized, no token provided" });
@@ -38,10 +40,8 @@ export const protectRoute = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+    console.log("[protectRoute] ✅ User authenticated:", user.email);
     req.user = user;
     next();
   } catch (error) {
-    console.log("Error in protectRoute middleware", error.message);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
+    console.log("❌ Error in protectRoute middleware", error.message);

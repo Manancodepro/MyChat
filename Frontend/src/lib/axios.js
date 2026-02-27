@@ -26,6 +26,8 @@ axiosInstance.interceptors.request.use((config) => {
     url: config.url,
     method: config.method,
     hasToken: !!token,
+    tokenLength: token ? token.length : 0,
+    authHeader: config.headers.Authorization ? "Set ✓" : "Not set ❌",
     cookies: document.cookie,
   });
   return config;
@@ -46,6 +48,7 @@ axiosInstance.interceptors.response.use(
       url: error.config?.url,
       status: error.response?.status,
       message: error.message,
+      authHeaderSent: error.config?.headers?.Authorization ? "Yes" : "No",
     });
     return Promise.reject(error);
   },

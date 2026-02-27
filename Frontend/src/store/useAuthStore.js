@@ -233,12 +233,18 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       if (res.data.token) {
-        localStorage.setItem("authToken", res.data.token); // ✅ Store token in localStorage
+        localStorage.setItem("authToken", res.data.token);
+        console.log(
+          "[auth] ✅ Token stored in localStorage:",
+          res.data.token.slice(0, 20) + "...",
+        );
+      } else {
+        console.log("[auth] ⚠️ No token in login response:", res.data);
       }
       toast.success("Logged in successfully");
-
       get().connectSocket();
     } catch (error) {
+      console.log("[auth] ❌ Login error:", error);
       toast.error(error.response.data.message);
     } finally {
       set({ isLoggingIn: false });
