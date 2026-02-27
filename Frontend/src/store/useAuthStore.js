@@ -174,7 +174,7 @@ import { io } from "socket.io-client";
 const SOCKET_URL =
   import.meta.env.MODE === "development" 
     ? "http://localhost:8001" 
-    : import.meta.env.VITE_BACKEND_URL || window.location.origin;
+    : (import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || window.location.origin);
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,

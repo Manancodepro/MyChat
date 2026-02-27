@@ -84,8 +84,8 @@ export const logout = (req, res) => {
       path: "/",
       maxAge: 0,
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
-      secure: process.env.NODE_ENV !== "development",
+      sameSite: "none", // "none" required for cross-origin requests on Render
+      secure: true, // HTTPS required on Render (production)
     });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
