@@ -40,6 +40,10 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
+
+// ✅ Serve uploaded files statically
+app.use("/uploads", express.static(path.join(__dirname, "Backend", "uploads")));
+
 // Note: using only the `cors` middleware above ensures preflight and
 // standard CORS headers are set. Avoid duplicating headers manually.
 
