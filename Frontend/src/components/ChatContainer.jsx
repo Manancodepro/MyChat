@@ -398,7 +398,7 @@ const ChatContainer = ({ onBack }) => {
         <ChatHeader onBack={onBack} />
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 relative">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3 relative">
         {messages
           .filter((message) => {
             // Only show messages for the selected user
