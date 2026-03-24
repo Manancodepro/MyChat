@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
+    "date-fns": "^3.0.0",
     "lucide-react": "^0.562.0",
     "mychatmine": "file:..",
     "react": "^19.2.0",

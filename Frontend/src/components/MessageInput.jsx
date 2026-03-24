@@ -132,6 +132,13 @@ const MessageInput = () => {
         onSchedule={handleScheduleMessage}
         isLoading={isScheduling}
       />
+
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleMessage}
+        isLoading={isScheduling}
+      />
     </div>
   );
 };

@@ -230,10 +230,12 @@ const ChatContainer = ({ onBack }) => {
     messages,
     getMessages,
     refreshMessages,
+    refreshMessages,
     isMessagesLoading,
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    cancelScheduledMessage,
     cancelScheduledMessage,
   } = useChatStore();
 
@@ -247,7 +249,9 @@ const ChatContainer = ({ onBack }) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
 
   // Load & subscribe
+  // Load & subscribe
   useEffect(() => {
+    if (!selectedUser?._id) return;
     if (!selectedUser?._id) return;
 
     getMessages(selectedUser._id);

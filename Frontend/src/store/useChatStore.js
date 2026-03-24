@@ -16,8 +16,10 @@ export const useChatStore = create((set, get) => ({
   users: [],
   selectedUser: null,
   scheduledMessages: [],
+  scheduledMessages: [],
   isUsersLoading: false,
   isMessagesLoading: false,
+  isScheduling: false,
   isScheduling: false,
 
   getUsers: async () => {
@@ -38,6 +40,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to load messages");
       toast.error(error?.response?.data?.message || "Failed to load messages");
     } finally {
       set({ isMessagesLoading: false });
@@ -136,6 +139,55 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  scheduleMessage: async (data) => {
+    const { selectedUser, messages } = get();
+    set({ isScheduling: true });
+    try {
+      const payload = {
+        text: data.text || "",
+        image: data.image || null,
+        scheduledTime: data.scheduledTime.toISOString(),
+      };
+
+      const res = await axiosInstance.post(
+        `/messages/schedule/${selectedUser._id}`,
+        payload,
+      );
+
+      set({ messages: [...messages, res.data] });
+      toast.success(
+        `Message scheduled for ${new Date(res.data.scheduledTime).toLocaleString()}`,
+      );
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to schedule message");
+    } finally {
+      set({ isScheduling: false });
+    }
+  },
+
+  cancelScheduledMessage: async (messageId) => {
+    try {
+      await axiosInstance.delete(`/messages/cancel/${messageId}`);
+      set((state) => ({
+        messages: state.messages.map((msg) =>
+          msg._id === messageId ? { ...msg, status: "cancelled" } : msg,
+        ),
+      }));
+      toast.success("Scheduled message cancelled");
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to cancel message");
+    }
+  },
+
+  getScheduledMessages: async () => {
+    try {
+      const res = await axiosInstance.get("/messages/scheduled/list");
+      set({ scheduledMessages: res.data });
+    } catch (error) {
+      console.error("Failed to fetch scheduled messages:", error);
+    }
+  },
+
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
@@ -169,7 +221,28 @@ export const useChatStore = create((set, get) => ({
       const receiverId = getIdString(newMessage.receiverId);
       const selId = getIdString(selectedUser._id);
       const authId = getIdString(useAuthStore.getState().authUser._id);
+      const authId = getIdString(useAuthStore.getState().authUser._id);
 
+      // Check if this message is relevant to current chat
+      const isRelevantToChat =
+        (senderId === selId && receiverId === authId) ||
+        (senderId === authId && receiverId === selId);
+
+      if (!isRelevantToChat) return;
+
+      // Prevent duplicate messages
+      const isDuplicate = get().messages.some(
+        (msg) => msg._id === newMessage._id,
+      );
+      if (isDuplicate) {
+        // Update existing message if it's a delivery update
+        set((state) => ({
+          messages: state.messages.map((msg) =>
+            msg._id === newMessage._id ? newMessage : msg,
+          ),
+        }));
+        return;
+      }
       // Check if this message is relevant to current chat
       const isRelevantToChat =
         (senderId === selId && receiverId === authId) ||
