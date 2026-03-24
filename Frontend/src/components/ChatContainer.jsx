@@ -230,12 +230,10 @@ const ChatContainer = ({ onBack }) => {
     messages,
     getMessages,
     refreshMessages,
-    refreshMessages,
     isMessagesLoading,
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
-    cancelScheduledMessage,
     cancelScheduledMessage,
   } = useChatStore();
 
